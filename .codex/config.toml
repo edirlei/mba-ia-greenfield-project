@@ -1,0 +1,13 @@
+# Project-scoped MCP configuration for Codex.
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.postgres]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-postgres", "postgresql://streamtube:streamtube@localhost:5433/streamtube"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60

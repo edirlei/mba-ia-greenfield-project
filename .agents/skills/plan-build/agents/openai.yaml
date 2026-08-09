@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Build"
+  short_description: "Gera o plano técnico com SIs"
+  default_prompt: "Use $plan-build para gerar o plano técnico desta fase."

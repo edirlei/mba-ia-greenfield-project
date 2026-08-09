@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Resolve"
+  short_description: "Resolve pendências e fixa bibliotecas"
+  default_prompt: "Use $plan-resolve para resolver as pendências desta fase."
