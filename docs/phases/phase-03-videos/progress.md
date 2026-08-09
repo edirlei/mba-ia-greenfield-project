@@ -1,7 +1,7 @@
 # phase-03-videos - Progress
 
 **Status:** in_progress
-**SIs:** 4/6 completed
+**SIs:** 5/6 completed
 
 ### SI-03.1 - Preparar storage, fila e configuracao
 - **Status:** completed
@@ -37,9 +37,13 @@
   - Persistem avisos nao bloqueantes de `--localstorage-file`, deprecacao do `pg` para `client.query()` concorrente e atualizacao disponivel do npm; os `ECONNREFUSED 127.0.0.1:1` observados pertencem ao cenario intencional de Redis indisponivel.
 
 ### SI-03.5 - Expor status, streaming e download
-- **Status:** pending
-- **Tests:** pending
-- **Observations:** none
+- **Status:** completed
+- **Tests:** 4 suites e 15 testes aprovados: 3 suites unitarias/integracao (8 testes) com Jest serial e `test/videos-media-access.e2e-spec.ts` (7 testes) com a configuracao E2E; `tsc --noEmit`, ESLint dos arquivos do SI e `git diff --check` tambem terminaram com codigo zero.
+- **Observations:**
+  - Os quatro endpoints autenticam o proprietario pela relacao do canal, ocultam videos alheios com `VIDEO_NOT_FOUND` e retornam metadata segura sem chaves ou diagnosticos internos.
+  - Fonte e thumbnail exigem `READY` e usam redirecionamento `307` para URLs publicas temporarias do bucket privado; MinIO confirmou streaming `Range` com `206`, download com nome sanitizado e thumbnail JPEG sem acesso anonimo.
+  - A limpeza final deixou zero videos, outbox, canais, usuarios, objetos e uploads multipart; o Redis manteve apenas as chaves operacionais vazias `meta` e `stalled-check` da fila, sem jobs.
+  - Persistem avisos nao bloqueantes de `--localstorage-file`, deprecacao do `pg` para `client.query()` concorrente e o `CustomGC` preexistente da cadeia `HandlebarsAdapter -> @css-inline/css-inline -> MailModule` no E2E.
 
 ### SI-03.6 - Fechar documentacao e qualidade da fase
 - **Status:** pending

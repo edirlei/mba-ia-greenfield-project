@@ -6,6 +6,8 @@ import { OutboxEvent } from './entities/outbox-event.entity';
 import { Video } from './entities/video.entity';
 import { VideoUploadService } from './services/video-upload.service';
 import { VideoCompletionService } from './services/video-completion.service';
+import { VideoMediaAccessService } from './services/video-media-access.service';
+import { VideoQueryService } from './services/video-query.service';
 import { VideosController } from './videos.controller';
 
 @Module({
@@ -14,7 +16,18 @@ import { VideosController } from './videos.controller';
     StorageModule,
   ],
   controllers: [VideosController],
-  providers: [VideoCompletionService, VideoUploadService],
-  exports: [TypeOrmModule, VideoCompletionService, VideoUploadService],
+  providers: [
+    VideoCompletionService,
+    VideoMediaAccessService,
+    VideoQueryService,
+    VideoUploadService,
+  ],
+  exports: [
+    TypeOrmModule,
+    VideoCompletionService,
+    VideoMediaAccessService,
+    VideoQueryService,
+    VideoUploadService,
+  ],
 })
 export class VideosModule {}

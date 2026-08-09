@@ -40,6 +40,12 @@ export interface StoredObjectMetadata {
   eTag?: string;
 }
 
+export interface SignedReadOptions {
+  disposition: 'inline' | 'attachment';
+  filename?: string;
+  contentType?: string;
+}
+
 interface S3Error {
   name?: string;
   $metadata?: { httpStatusCode?: number };
@@ -199,6 +205,28 @@ export class S3StorageService {
           Body: body,
           ContentType: contentType,
         }),
+      );
+    } catch {
+      throw new VideoStorageUnavailableException();
+    }
+  }
+
+  async signReadUrl(key: string, options: SignedReadOptions): Promise<string> {
+    try {
+      const disposition = options.filename
+        ? `${options.disposition}; filename="${options.filename}"`
+        : options.disposition;
+      return await getSignedUrl(
+        this.publicClient,
+        new GetObjectCommand({
+          Bucket: this.config.bucket,
+          Key: key,
+          ResponseContentDisposition: disposition,
+          ...(options.contentType && {
+            ResponseContentType: options.contentType,
+          }),
+        }),
+        { expiresIn: this.config.readUrlTtlSeconds },
       );
     } catch {
       throw new VideoStorageUnavailableException();
