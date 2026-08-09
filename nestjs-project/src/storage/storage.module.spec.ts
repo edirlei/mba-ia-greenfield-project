@@ -25,8 +25,8 @@ describe('StorageModule', () => {
 
     const internalClient = module.get<S3Client>(INTERNAL_S3_CLIENT);
     const publicClient = module.get<S3Client>(PUBLIC_S3_CLIENT);
-    const internalEndpoint = await internalClient.config.endpoint();
-    const publicEndpoint = await publicClient.config.endpoint();
+    const internalEndpoint = await internalClient.config.endpoint!();
+    const publicEndpoint = await publicClient.config.endpoint!();
 
     expect(internalClient).toBeInstanceOf(S3Client);
     expect(publicClient).toBeInstanceOf(S3Client);
