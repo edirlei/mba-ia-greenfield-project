@@ -16,6 +16,7 @@ import { envValidationSchema } from './config/env.validation';
 import { QueueModule } from './queue/queue.module';
 import { StorageModule } from './storage/storage.module';
 import { VideosModule } from './videos/videos.module';
+import { OutboxPublisherModule } from './videos/processing/outbox-publisher.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { VideosModule } from './videos/videos.module';
     QueueModule,
     AuthModule,
     VideosModule,
+    OutboxPublisherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

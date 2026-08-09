@@ -1,7 +1,7 @@
 # phase-03-videos - Progress
 
 **Status:** in_progress
-**SIs:** 3/6 completed
+**SIs:** 4/6 completed
 
 ### SI-03.1 - Preparar storage, fila e configuracao
 - **Status:** completed
@@ -27,9 +27,14 @@
   - Persistem avisos nao bloqueantes de `--localstorage-file` sem caminho e deprecacao do `pg` para chamadas concorrentes de `client.query()`; o E2E manteve o `CustomGC` preexistente da cadeia `HandlebarsAdapter -> @css-inline/css-inline -> MailModule`.
 
 ### SI-03.4 - Processar video no worker FFmpeg
-- **Status:** pending
-- **Tests:** pending
-- **Observations:** none
+- **Status:** completed
+- **Tests:** 5 suites e 17 testes aprovados com Jest serial e `--detectOpenHandles`: publicador outbox unitario/integracao, processador de midia com FFmpeg/MinIO, consumer unitario e job completo com PostgreSQL/Redis/MinIO; `tsc --noEmit`, ESLint dos arquivos do SI e `docker compose config` terminaram com codigo zero.
+- **Observations:**
+  - O publicador usa lote com `FOR UPDATE SKIP LOCKED`, `jobId = eventId`, cinco tentativas e backoff exponencial; indisponibilidade simulada do Redis manteve a outbox pendente e a recuperacao publicou o job sem nova chamada HTTP.
+  - O worker Nest standalone processou uma fixture real com FFmpeg/ffprobe 5.1.9, persistiu metadados normalizados e duracao, criou `videos/{videoId}/thumbnails/default.jpg` e tratou reentrega em `READY` como no-op.
+  - `docker compose up -d video-worker` iniciou um processo saudavel sem portas HTTP, com um consumidor BullMQ, concorrencia configuravel, volume temporario proprio e parada/reinicio por `SIGTERM` confirmados.
+  - A limpeza final deixou zero videos, outbox, jobs, objetos, uploads incompletos e arquivos temporarios; o `video-worker` permaneceu saudavel e ocioso para validacao funcional.
+  - Persistem avisos nao bloqueantes de `--localstorage-file`, deprecacao do `pg` para `client.query()` concorrente e atualizacao disponivel do npm; os `ECONNREFUSED 127.0.0.1:1` observados pertencem ao cenario intencional de Redis indisponivel.
 
 ### SI-03.5 - Expor status, streaming e download
 - **Status:** pending

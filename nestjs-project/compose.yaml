@@ -17,6 +17,30 @@ services:
       redis:
         condition: service_healthy
 
+  video-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npm run start:worker
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    volumes:
+      - .:/home/node/app
+      - video-worker-temp:/tmp/streamtube-videos
+    depends_on:
+      db:
+        condition: service_healthy
+      minio-init:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "pgrep -f 'src/video-worker.ts' >/dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
   db:
     image: postgres:17
     ports:
@@ -104,3 +128,4 @@ services:
 volumes:
   redis-data:
   minio-data:
+  video-worker-temp:

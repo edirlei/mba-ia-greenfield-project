@@ -2,13 +2,16 @@ import {
   AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
+  GetObjectCommand,
   HeadObjectCommand,
+  PutObjectCommand,
   S3Client,
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
+import { Readable } from 'node:stream';
 import {
   VideoStorageUnavailableException,
   VideoUploadInvalidPartsException,
@@ -165,6 +168,39 @@ export class S3StorageService {
       ) {
         throw new VideoUploadObjectInvalidException();
       }
+      throw new VideoStorageUnavailableException();
+    }
+  }
+
+  async getObjectStream(key: string): Promise<Readable> {
+    try {
+      const result = await this.internalClient.send(
+        new GetObjectCommand({ Bucket: this.config.bucket, Key: key }),
+      );
+      if (!(result.Body instanceof Readable)) {
+        throw new Error('Storage did not return a Node.js readable stream');
+      }
+      return result.Body;
+    } catch {
+      throw new VideoStorageUnavailableException();
+    }
+  }
+
+  async putObject(
+    key: string,
+    body: Uint8Array,
+    contentType: string,
+  ): Promise<void> {
+    try {
+      await this.internalClient.send(
+        new PutObjectCommand({
+          Bucket: this.config.bucket,
+          Key: key,
+          Body: body,
+          ContentType: contentType,
+        }),
+      );
+    } catch {
       throw new VideoStorageUnavailableException();
     }
   }
