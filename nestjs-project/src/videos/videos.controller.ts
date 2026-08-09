@@ -19,18 +19,24 @@ import type { JwtPayload } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ApiErrorEnvelope } from '../common/openapi/api-error-envelope.dto';
 import { CreateVideoDto } from './dto/create-video.dto';
+import { CompleteVideoUploadDto } from './dto/complete-video-upload.dto';
 import { UploadPartsDto } from './dto/upload-parts.dto';
 import {
   UploadPartsResponseDto,
   VideoUploadResponseDto,
 } from './dto/video-upload-response.dto';
 import { VideoUploadService } from './services/video-upload.service';
+import { VideoCompletionService } from './services/video-completion.service';
+import { VideoCompletionResponseDto } from './dto/video-completion-response.dto';
 
 @ApiTags('videos')
 @ApiBearerAuth('access-token')
 @Controller('videos')
 export class VideosController {
-  constructor(private readonly videoUploadService: VideoUploadService) {}
+  constructor(
+    private readonly videoUploadService: VideoUploadService,
+    private readonly videoCompletionService: VideoCompletionService,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -114,5 +120,56 @@ export class VideosController {
     @Body() dto: UploadPartsDto,
   ): Promise<UploadPartsResponseDto> {
     return this.videoUploadService.signUploadParts(user.sub, videoId, dto);
+  }
+
+  @Post(':id/upload-completion')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({
+    summary: 'Complete a multipart video upload',
+    description:
+      'Completes and verifies the source object, then atomically transitions the video to processing and records an outbox command.',
+  })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Video upload ID' })
+  @ApiResponse({
+    status: 202,
+    description: 'Upload completed or already processing',
+    type: VideoCompletionResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Multipart parts are invalid',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid access token',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Video not found for the authenticated channel',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Video status or upload identity is invalid',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Completed object is missing or has an unexpected size',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  @ApiResponse({
+    status: 502,
+    description: 'Object storage is unavailable',
+    schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
+  })
+  async completeUpload(
+    @CurrentUser() user: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) videoId: string,
+    @Body() dto: CompleteVideoUploadDto,
+  ): Promise<VideoCompletionResponseDto> {
+    return this.videoCompletionService.completeUpload(user.sub, videoId, dto);
   }
 }

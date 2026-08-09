@@ -94,3 +94,13 @@ export class VideoStorageUnavailableException extends DomainException {
     );
   }
 }
+
+export class VideoUploadObjectInvalidException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_UPLOAD_OBJECT_INVALID',
+      422,
+      'Completed video object is missing or has an unexpected size',
+    );
+  }
+}

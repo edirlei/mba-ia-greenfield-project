@@ -1,7 +1,7 @@
 # phase-03-videos - Progress
 
 **Status:** in_progress
-**SIs:** 2/6 completed
+**SIs:** 3/6 completed
 
 ### SI-03.1 - Preparar storage, fila e configuracao
 - **Status:** completed
@@ -18,9 +18,13 @@
   - Persistem avisos nao bloqueantes de `--localstorage-file` sem caminho e deprecacao do `pg` para chamadas concorrentes de `client.query()`.
 
 ### SI-03.3 - Finalizar upload com outbox transacional
-- **Status:** pending
-- **Tests:** pending
-- **Observations:** none
+- **Status:** completed
+- **Tests:** 5 suites e 19 testes aprovados: 4 suites unitarias/integracao (13 testes) com Jest serial e `test/videos-upload-completion.e2e-spec.ts` (6 testes) com a configuracao E2E; `tsc --noEmit` e ESLint restrito aos arquivos do SI tambem terminaram com codigo zero.
+- **Observations:**
+  - O endpoint `POST /videos/:id/upload-completion` conclui e valida o multipart no MinIO, faz a transicao idempotente para `PROCESSING` sob lock pessimista e grava exatamente um `video.processing.requested.v1` na mesma transacao PostgreSQL.
+  - Testes reais confirmaram repeticao idempotente, serializacao de chamadas concorrentes, rejeicao de partes e tamanho invalidos, ocultacao entre canais e rollback sem outbox parcial.
+  - A limpeza final deixou zero videos, zero eventos outbox, zero objetos e zero uploads multipart incompletos de teste.
+  - Persistem avisos nao bloqueantes de `--localstorage-file` sem caminho e deprecacao do `pg` para chamadas concorrentes de `client.query()`; o E2E manteve o `CustomGC` preexistente da cadeia `HandlebarsAdapter -> @css-inline/css-inline -> MailModule`.
 
 ### SI-03.4 - Processar video no worker FFmpeg
 - **Status:** pending

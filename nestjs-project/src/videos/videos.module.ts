@@ -5,6 +5,7 @@ import { StorageModule } from '../storage/storage.module';
 import { OutboxEvent } from './entities/outbox-event.entity';
 import { Video } from './entities/video.entity';
 import { VideoUploadService } from './services/video-upload.service';
+import { VideoCompletionService } from './services/video-completion.service';
 import { VideosController } from './videos.controller';
 
 @Module({
@@ -13,7 +14,7 @@ import { VideosController } from './videos.controller';
     StorageModule,
   ],
   controllers: [VideosController],
-  providers: [VideoUploadService],
-  exports: [TypeOrmModule, VideoUploadService],
+  providers: [VideoCompletionService, VideoUploadService],
+  exports: [TypeOrmModule, VideoCompletionService, VideoUploadService],
 })
 export class VideosModule {}
