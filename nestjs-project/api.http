@@ -14,6 +14,11 @@
 @confirmationToken = <token do e-mail de confirmacao>
 @resetToken = <token do e-mail de reset>
 
+# Video funcional: ajuste o tamanho exato e coloque sample-video.mp4 ao lado deste arquivo
+@videoSizeBytes = 1048576
+# Depois do PUT, copie o ETag completo retornado pelo MinIO, incluindo as aspas
+@uploadedPartEtag = "cole-o-etag-retornado-pelo-minio"
+
 
 ###
 # ─────────────────────────────────────────────
@@ -118,3 +123,80 @@ Content-Type: {{contentType}}
   "token": "{{resetToken}}",
   "new_password": "new-password123"
 }
+
+
+###
+# -----------------------------------------------------------------------------
+# VIDEOS - UPLOAD, PROCESSAMENTO E LEITURA
+# -----------------------------------------------------------------------------
+
+### 10. Criar sessao multipart
+# @name createVideo
+POST {{baseUrl}}/videos
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Video funcional da Fase 03",
+  "originalFilename": "sample-video.mp4",
+  "contentType": "video/mp4",
+  "sizeBytes": {{videoSizeBytes}}
+}
+
+
+### 11. Assinar a primeira parte
+# @name signVideoPart
+POST {{baseUrl}}/videos/{{createVideo.response.body.$.id}}/upload-parts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "uploadId": "{{createVideo.response.body.$.uploadId}}",
+  "partNumbers": [1]
+}
+
+
+### 12. Enviar os bytes diretamente ao MinIO
+# @name uploadVideoPart
+PUT {{signVideoPart.response.body.$.parts[0].url}}
+Content-Type: application/octet-stream
+
+< ./sample-video.mp4
+
+
+### 13. Finalizar o upload
+# Antes desta chamada, atualize @uploadedPartEtag com o header ETag do passo 12
+# @name completeVideo
+POST {{baseUrl}}/videos/{{createVideo.response.body.$.id}}/upload-completion
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "uploadId": "{{createVideo.response.body.$.uploadId}}",
+  "parts": [
+    {
+      "partNumber": 1,
+      "eTag": {{uploadedPartEtag}}
+    }
+  ]
+}
+
+
+### 14. Consultar ate o status ficar READY
+GET {{baseUrl}}/videos/{{createVideo.response.body.$.publicId}}
+Authorization: Bearer {{accessToken}}
+
+
+### 15. Streaming (307 para URL assinada inline)
+GET {{baseUrl}}/videos/{{createVideo.response.body.$.publicId}}/stream
+Authorization: Bearer {{accessToken}}
+
+
+### 16. Download (307 para URL assinada attachment)
+GET {{baseUrl}}/videos/{{createVideo.response.body.$.publicId}}/download
+Authorization: Bearer {{accessToken}}
+
+
+### 17. Thumbnail (307 para JPEG privado assinado)
+GET {{baseUrl}}/videos/{{createVideo.response.body.$.publicId}}/thumbnail
+Authorization: Bearer {{accessToken}}

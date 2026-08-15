@@ -1,0 +1,14 @@
+export const VIDEO_UPLOAD = {
+  MAX_SIZE_BYTES: 10_737_418_240,
+  PART_SIZE_BYTES: 67_108_864,
+  MAX_SIGNED_PARTS_PER_REQUEST: 100,
+  MAX_PARTS: 160,
+  PUBLIC_ID_BYTES: 16,
+  PUBLIC_ID_MAX_ATTEMPTS: 5,
+} as const;
+
+export const VIDEO_PROCESSING_EVENT = {
+  AGGREGATE_TYPE: 'video',
+  EVENT_TYPE: 'video.processing.requested.v1',
+  SCHEMA_VERSION: 1,
+} as const;

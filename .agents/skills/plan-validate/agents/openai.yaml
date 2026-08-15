@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Validate"
+  short_description: "Valida lacunas e coerência do planejamento"
+  default_prompt: "Use $plan-validate para validar o contexto desta fase."

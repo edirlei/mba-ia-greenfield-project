@@ -32,8 +32,13 @@ docker compose exec nestjs-api npm run start:dev
 ```
 
 Services:
-- `nestjs-api` — NestJS API, port `3000`
-- `db` — PostgreSQL 17, port `5432`, database `streamtube`, user/password `streamtube`
+- `nestjs-api` - NestJS API, port `3000`
+- `db` - PostgreSQL 17, port `5432`, database `streamtube`, user/password `streamtube`
+- `redis` - Redis 7.4 with AOF and `noeviction`, used by BullMQ
+- `minio` - private S3-compatible storage, API port `9000`, console `9001`
+- `minio-init` - idempotently creates and protects the storage bucket
+- `video-worker` - standalone Nest process that runs FFmpeg/ffprobe jobs
+- `mailpit` - local SMTP and web inbox, port `8025`
 
 All verification and teardown commands run on the **host machine**:
 
@@ -71,7 +76,20 @@ npm run test:e2e                         # End-to-end tests (always with --runIn
 npx tsc --noEmit                         # Type-check (required before declaring a task done)
 npm run lint                             # ESLint with auto-fix
 npm run format                           # Prettier formatting
+npm run openapi:export                   # Regenerate openapi.json
+npm run start:worker                     # Run the standalone video worker
 ```
+
+## Video Upload And Processing
+
+- `POST /videos` starts a multipart upload; the declared limit is 10 GB and each non-final part is 64 MiB.
+- Clients upload bytes directly to signed MinIO URLs, never through NestJS.
+- Completion moves the video to `PROCESSING` and writes one transactional outbox event.
+- The outbox publisher sends an idempotent BullMQ job. `video-worker` downloads the source, probes it, creates a JPEG thumbnail and persists `READY` metadata.
+- `GET /videos/:publicId` exposes safe owner metadata. `/stream`, `/download` and `/thumbnail` return `307` signed URLs only when the video is `READY`.
+- MinIO remains private; it serves byte ranges and downloads after the API authorizes the owner.
+
+Operational settings live in `.env`: `STORAGE_*`, `MINIO_*`, `REDIS_*`, `VIDEO_PROCESSING_*` and `OUTBOX_*`. Inside Compose, use `minio`, `redis` and `db` as hosts. `STORAGE_PUBLIC_ENDPOINT` must remain reachable by the client, normally `http://localhost:9000` locally.
 
 ### Host-only commands (Docker / connectivity probes)
 

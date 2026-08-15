@@ -48,3 +48,65 @@ export class TokenReuseDetectedException extends DomainException {
     );
   }
 }
+
+export class VideoNotFoundException extends DomainException {
+  constructor() {
+    super('VIDEO_NOT_FOUND', 404, 'Video not found');
+  }
+}
+
+export class VideoUploadTooLargeException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_UPLOAD_TOO_LARGE',
+      413,
+      'Video size exceeds the 10 GB upload limit',
+    );
+  }
+}
+
+export class VideoUploadInvalidPartsException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_UPLOAD_INVALID_PARTS',
+      400,
+      'Part numbers are invalid for this upload',
+    );
+  }
+}
+
+export class VideoUploadInvalidStateException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_UPLOAD_INVALID_STATE',
+      409,
+      'Video is not available for this upload operation',
+    );
+  }
+}
+
+export class VideoStorageUnavailableException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_STORAGE_UNAVAILABLE',
+      502,
+      'Video storage is temporarily unavailable',
+    );
+  }
+}
+
+export class VideoUploadObjectInvalidException extends DomainException {
+  constructor() {
+    super(
+      'VIDEO_UPLOAD_OBJECT_INVALID',
+      422,
+      'Completed video object is missing or has an unexpected size',
+    );
+  }
+}
+
+export class VideoNotReadyException extends DomainException {
+  constructor() {
+    super('VIDEO_NOT_READY', 409, 'Video media is not ready');
+  }
+}

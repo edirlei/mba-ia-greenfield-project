@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Context"
+  short_description: "Consolida o contexto obrigatório da fase"
+  default_prompt: "Use $plan-context para gerar o contexto desta fase."
