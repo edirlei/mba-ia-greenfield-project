@@ -23,8 +23,17 @@ See `docs/diagrams/software-arch.mermaid` for the full diagram. Key containers:
 - **Video Worker** (FFmpeg) → consumes jobs from queue, processes videos, updates DB and storage
 - **Database** (PostgreSQL) → users, channels, videos, comments, likes
 - **Object Storage** (S3/MinIO) → video files and thumbnails
-- **Message Queue** (TBD) → video processing job queue
+- **Message Queue** (Redis + BullMQ) → durable video processing job queue
 - **Email Service** (SMTP) → account confirmation and password recovery
+
+## Phase 03 Video Flow
+
+- `POST /videos` creates a private multipart upload for files up to 10 GB.
+- Video bytes travel directly between the client and MinIO; the API only signs URLs and persists state.
+- `POST /videos/:id/upload-completion` records a transactional outbox event and moves the video to `PROCESSING`.
+- The standalone `video-worker` consumes BullMQ jobs, uses FFmpeg/ffprobe, writes metadata and a JPEG thumbnail, and moves the video to `READY`.
+- Owner-authenticated stable URLs expose status, stream, download and thumbnail. Media routes return `307` to short-lived signed URLs; MinIO serves `Range` requests.
+- Phase 03 does not publish videos anonymously. Public viewing remains a future product capability.
 
 ## Docker Networking
 

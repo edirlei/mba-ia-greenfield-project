@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement"
+  short_description: "Implementa o plano SI por SI"
+  default_prompt: "Use $implement para executar o plano desta fase SI por SI."
