@@ -110,6 +110,93 @@ describe('exportSpec (integration)', () => {
     }
   });
 
+  it('documents all video endpoints with bearer auth and expected status codes', () => {
+    const paths = document.paths as Record<
+      string,
+      Record<string, Record<string, unknown>>
+    >;
+    const operations = [
+      {
+        path: '/videos',
+        method: 'post',
+        responses: ['201', '400', '401', '413', '502'],
+      },
+      {
+        path: '/videos/{id}/upload-parts',
+        method: 'post',
+        responses: ['200', '400', '401', '404', '409', '502'],
+      },
+      {
+        path: '/videos/{id}/upload-completion',
+        method: 'post',
+        responses: ['202', '400', '401', '404', '409', '422', '502'],
+      },
+      {
+        path: '/videos/{publicId}',
+        method: 'get',
+        responses: ['200', '401', '404'],
+      },
+      {
+        path: '/videos/{publicId}/stream',
+        method: 'get',
+        responses: ['307', '401', '404', '409', '502'],
+      },
+      {
+        path: '/videos/{publicId}/download',
+        method: 'get',
+        responses: ['307', '401', '404', '409', '502'],
+      },
+      {
+        path: '/videos/{publicId}/thumbnail',
+        method: 'get',
+        responses: ['307', '401', '404', '409', '502'],
+      },
+    ];
+
+    for (const expected of operations) {
+      const operation = paths[expected.path]?.[expected.method];
+      expect(operation).toBeDefined();
+      expect(
+        Object.keys(operation.responses as Record<string, unknown>),
+      ).toEqual(expect.arrayContaining(expected.responses));
+      const security = operation.security as Array<Record<string, unknown>>;
+      expect(
+        security.some((requirement) => 'access-token' in requirement),
+      ).toBe(true);
+    }
+  });
+
+  it('exports explicit video request schemas and examples', () => {
+    const components = document.components as Record<string, unknown>;
+    const schemas = components.schemas as Record<
+      string,
+      Record<string, unknown>
+    >;
+    const expectedProperties: Record<string, string[]> = {
+      CreateVideoDto: ['title', 'originalFilename', 'contentType', 'sizeBytes'],
+      UploadPartsDto: ['uploadId', 'partNumbers'],
+      CompleteVideoUploadDto: ['uploadId', 'parts'],
+    };
+
+    for (const [schemaName, propertyNames] of Object.entries(
+      expectedProperties,
+    )) {
+      const schema = schemas[schemaName];
+      expect(schema).toBeDefined();
+      expect(schema.required).toEqual(expect.arrayContaining(propertyNames));
+      const properties = schema.properties as Record<
+        string,
+        Record<string, unknown>
+      >;
+      expect(Object.keys(properties)).toEqual(
+        expect.arrayContaining(propertyNames),
+      );
+      for (const propertyName of propertyNames) {
+        expect(properties[propertyName].example).toBeDefined();
+      }
+    }
+  });
+
   it('all auth endpoints have a non-empty summary', () => {
     const paths = document.paths as Record<
       string,

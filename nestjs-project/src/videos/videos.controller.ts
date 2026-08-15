@@ -69,12 +69,12 @@ export class VideosController {
   })
   @ApiResponse({
     status: 413,
-    description: 'Video exceeds the upload size limit',
+    description: 'VIDEO_UPLOAD_TOO_LARGE: video exceeds the 10 GB limit',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: object storage is unavailable',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async createUpload(
@@ -109,17 +109,18 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 409,
-    description: 'Video status or upload identity is invalid',
+    description: 'VIDEO_UPLOAD_INVALID_STATE: upload is not in DRAFT state',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: signed URLs could not be issued',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async signUploadParts(
@@ -145,7 +146,7 @@ export class VideosController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Multipart parts are invalid',
+    description: 'VIDEO_UPLOAD_INVALID_PARTS: multipart parts are invalid',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
@@ -155,22 +156,25 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 409,
-    description: 'Video status or upload identity is invalid',
+    description:
+      'VIDEO_UPLOAD_INVALID_STATE: upload state or identity is invalid',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 422,
-    description: 'Completed object is missing or has an unexpected size',
+    description:
+      'VIDEO_UPLOAD_OBJECT_INVALID: object is missing or has an unexpected size',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: completion could not be confirmed',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async completeUpload(
@@ -203,7 +207,12 @@ export class VideosController {
     headers: {
       Location: {
         description: 'Public pre-signed storage URL',
-        schema: { type: 'string', format: 'uri' },
+        schema: {
+          type: 'string',
+          format: 'uri',
+          example:
+            'http://localhost:9000/streamtube/videos/id/source?X-Amz-...',
+        },
       },
     },
   })
@@ -214,17 +223,18 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 409,
-    description: 'Video is not ready for media access',
+    description: 'VIDEO_NOT_READY: source media is not READY',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: read URL could not be signed',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async stream(
@@ -258,7 +268,12 @@ export class VideosController {
     headers: {
       Location: {
         description: 'Public pre-signed storage URL',
-        schema: { type: 'string', format: 'uri' },
+        schema: {
+          type: 'string',
+          format: 'uri',
+          example:
+            'http://localhost:9000/streamtube/videos/id/source?X-Amz-...',
+        },
       },
     },
   })
@@ -269,17 +284,18 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 409,
-    description: 'Video is not ready for media access',
+    description: 'VIDEO_NOT_READY: source media is not READY',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: read URL could not be signed',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async download(
@@ -313,7 +329,12 @@ export class VideosController {
     headers: {
       Location: {
         description: 'Public pre-signed storage URL',
-        schema: { type: 'string', format: 'uri' },
+        schema: {
+          type: 'string',
+          format: 'uri',
+          example:
+            'http://localhost:9000/streamtube/videos/id/thumbnails/default.jpg?X-Amz-...',
+        },
       },
     },
   })
@@ -324,17 +345,18 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 409,
-    description: 'Video or thumbnail is not ready for media access',
+    description: 'VIDEO_NOT_READY: video or thumbnail is not READY',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   @ApiResponse({
     status: 502,
-    description: 'Object storage is unavailable',
+    description: 'VIDEO_STORAGE_UNAVAILABLE: read URL could not be signed',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async thumbnail(
@@ -369,7 +391,8 @@ export class VideosController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Video not found for the authenticated channel',
+    description:
+      'VIDEO_NOT_FOUND: video is absent or belongs to another channel',
     schema: { $ref: getSchemaPath(ApiErrorEnvelope) },
   })
   async details(

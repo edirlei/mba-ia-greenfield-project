@@ -13,8 +13,6 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { DataSource, type Repository } from 'typeorm';
 import { AppModule } from '../src/app.module';
-import { RefreshToken } from '../src/auth/entities/refresh-token.entity';
-import { VerificationToken } from '../src/auth/entities/verification-token.entity';
 import { Channel } from '../src/channels/entities/channel.entity';
 import { DomainExceptionFilter } from '../src/common/filters/domain-exception.filter';
 import { ValidationExceptionFilter } from '../src/common/filters/validation-exception.filter';

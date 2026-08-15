@@ -2,7 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { VideoStatus } from '../entities/video.entity';
 
 export class VideoUploadResponseDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({
+    format: 'uuid',
+    example: '8f184c66-e3d9-4d3d-a2e6-5abc1d39fb7d',
+  })
   id: string;
 
   @ApiProperty({
@@ -15,7 +18,7 @@ export class VideoUploadResponseDto {
   @ApiProperty({ enum: VideoStatus, example: VideoStatus.DRAFT })
   status: VideoStatus;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'VXBsb2FkSWQtZXhhbXBsZQ' })
   uploadId: string;
 
   @ApiProperty({ example: 67_108_864 })
@@ -32,18 +35,24 @@ export class UploadPartUrlDto {
   @ApiProperty({ minimum: 1, example: 1 })
   partNumber: number;
 
-  @ApiProperty({ format: 'uri' })
+  @ApiProperty({
+    format: 'uri',
+    example: 'http://localhost:9000/streamtube/videos/id/source?X-Amz-...',
+  })
   url: string;
 }
 
 export class UploadPartsResponseDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({
+    format: 'uuid',
+    example: '8f184c66-e3d9-4d3d-a2e6-5abc1d39fb7d',
+  })
   videoId: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'VXBsb2FkSWQtZXhhbXBsZQ' })
   uploadId: string;
 
-  @ApiProperty({ format: 'date-time' })
+  @ApiProperty({ format: 'date-time', example: '2026-08-09T12:15:00.000Z' })
   expiresAt: string;
 
   @ApiProperty({ type: () => [UploadPartUrlDto] })

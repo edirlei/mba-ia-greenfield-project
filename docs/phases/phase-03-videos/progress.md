@@ -1,7 +1,7 @@
 # phase-03-videos - Progress
 
-**Status:** in_progress
-**SIs:** 5/6 completed
+**Status:** completed
+**SIs:** 6/6 completed
 
 ### SI-03.1 - Preparar storage, fila e configuracao
 - **Status:** completed
@@ -46,6 +46,14 @@
   - Persistem avisos nao bloqueantes de `--localstorage-file`, deprecacao do `pg` para `client.query()` concorrente e o `CustomGC` preexistente da cadeia `HandlebarsAdapter -> @css-inline/css-inline -> MailModule` no E2E.
 
 ### SI-03.6 - Fechar documentacao e qualidade da fase
-- **Status:** pending
-- **Tests:** pending
-- **Observations:** none
+- **Status:** completed
+- **Tests:** suite global com 44/44 suites e 208/208 testes aprovados; suite E2E com 6/6 suites e 69/69 testes aprovados; `npm run lint`, `npx tsc --noEmit`, `npm run build`, `docker compose config --quiet`, export OpenAPI e `git diff --check` terminaram com codigo zero.
+- **Observations:**
+  - A jornada funcional real cadastrou e confirmou um usuario, enviou um MP4 de 31.465 bytes diretamente ao MinIO, concluiu o multipart, observou `PROCESSING -> READY`, duracao de 2 segundos e thumbnail disponivel.
+  - O storage respondeu `206` para `Range: bytes=0-1023`, o download de 31.465 bytes manteve o SHA-256 da fonte e a thumbnail JPEG sem assinatura retornou `403`.
+  - `openapi.json` foi regenerado com os sete endpoints de video, schemas de entrada explicitos, exemplos, Bearer auth e respostas por status; o teste de export passou com 11/11 casos.
+  - README, exemplos HTTP, guias de agentes, CLAUDE e diagrama C4 foram reconciliados com PostgreSQL, MinIO privado, Redis/BullMQ, outbox e worker FFmpeg reais.
+  - A limpeza concorrente do teste de migrations foi serializada para eliminar deadlock; o mock de `QueryFailedError` foi alinhado ao `driverError` real do TypeORM.
+  - O lint global passou apos manter regras estritas na producao e aplicar tolerancias de mocks somente a testes; restaram 45 warnings `no-unsafe-argument` nao bloqueantes.
+  - A limpeza final confirmou zero videos, outbox, canais, usuarios, objetos, uploads multipart e temporarios; API, Swagger e todos os servicos Compose permaneceram ativos e saudaveis.
+  - Persistem avisos nao bloqueantes de `--localstorage-file`, deprecacao do `pg` para `client.query()` concorrente e o `CustomGC` da cadeia `HandlebarsAdapter -> @css-inline/css-inline -> MailModule`; os `ECONNREFUSED 127.0.0.1:1` pertencem ao cenario intencional de Redis indisponivel.

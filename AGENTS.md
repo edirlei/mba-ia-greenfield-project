@@ -45,6 +45,16 @@ use o nome do servico do Compose como host, nunca `localhost` ou `127.0.0.1`.
 Ferramentas MCP executadas no host podem usar a porta publicada, pois nao fazem
 parte da rede interna do Compose.
 
+## Fluxo De Videos Implementado
+
+- `nestjs-api` autoriza uploads e grava a outbox; nao recebe os bytes do video.
+- `minio` mantem fontes e thumbnails em bucket privado.
+- `redis` e BullMQ transportam comandos de processamento.
+- `video-worker` executa FFmpeg/ffprobe e atualiza o PostgreSQL.
+- Uploads aceitam ate 10 GB, usam partes de 64 MiB e URLs assinadas temporarias.
+- Streaming, download e thumbnail exigem o proprietario autenticado e estado
+  `READY` na Fase 03.
+
 ## Git
 
 - `main` e estavel e nao recebe commits diretos.
